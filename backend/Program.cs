@@ -60,6 +60,11 @@ app.MapGet("/api/exercises", (AppDbContext db) =>
 
 app.MapPost("/api/exercises", (CreateExerciseRequest request, AppDbContext db) =>
 {
+    if (!ExerciseValidator.IsValid(request))
+    {
+        return Results.BadRequest("Name and description are required.");
+    }
+
     var exercise = new Exercise(0, request.Name, request.Description);
     db.Exercises.Add(exercise);
     db.SaveChanges();
