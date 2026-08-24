@@ -57,6 +57,15 @@ app.MapGet("/api/exercises", (AppDbContext db) =>
 })
 .WithName("GetExercises");
 
+app.MapPost("/api/exercises", (CreateExerciseRequest request, AppDbContext db) =>
+{
+    var exercise = new Exercise(0, request.Name, request.Description);
+    db.Exercises.Add(exercise);
+    db.SaveChanges();
+    return Results.Created($"/api/exercises/{exercise.Id}", exercise);
+})
+.WithName("CreateExercise");
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
