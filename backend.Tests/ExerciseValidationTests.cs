@@ -14,4 +14,24 @@ public class ExerciseValidationTests
 
         Assert.False(result);
     }
+
+    [Fact]
+    public void IsValid_ReturnsTrue_WhenNameAndDescriptionIsNotEmpty()
+    {
+        var request = new CreateExerciseRequest("Name", "Some description");
+
+        bool result = ExerciseValidator.IsValid(request);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsValid_ReturnsFalse_WhenDescriptionIsEmpty()
+    {
+        var request = new CreateExerciseRequest("Name", "");
+
+        bool result = ExerciseValidator.IsValid(request);
+
+        Assert.False(result);
+    }
 }
