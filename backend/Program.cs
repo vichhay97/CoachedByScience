@@ -61,6 +61,21 @@ app.MapGet("/api/exercises", (AppDbContext db) =>
 })
 .WithName("GetExercises");
 
+app.MapGet("/api/musclegroups", (AppDbContext db) =>
+{
+    var muscleGroups = db.MuscleGroups
+        .Include(mg => mg.Exercises)
+        .Select(mg => new MuscleGroupResponse(
+            mg.Id,
+            mg.Name,
+            mg.Exercises.Select(e => new ExerciseSummary(e.Id, e.Name, e.Description)).ToList()
+        ))
+        .ToList();
+
+    return muscleGroups;
+})
+.WithName("GetMuscleGroups");
+
 app.MapPost("/api/exercises", (CreateExerciseRequest request, AppDbContext db) =>
 {
     if (!ExerciseValidator.IsValid(request))
