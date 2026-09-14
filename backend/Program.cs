@@ -49,13 +49,12 @@ app.MapGet("/api/exercises", (AppDbContext db) =>
 {
     var exercises = db.Exercises
         .Include(e => e.MuscleGroups)
-        .Select(e => new
-        {
+        .Select(e => new ExerciseResponse(
             e.Id,
             e.Name,
             e.Description,
-            MuscleGroups = e.MuscleGroups.Select(mg => new { mg.Id, mg.Name })
-        })
+            e.MuscleGroups.Select(mg => new MuscleGroupSummary(mg.Id, mg.Name)).ToList()
+        ))
         .ToList();
 
     return exercises;
