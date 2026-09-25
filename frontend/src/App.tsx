@@ -28,6 +28,8 @@ function App() {
         {exercises.map((exercise) => (
           <li key={exercise.id}>
             <strong>{exercise.name}</strong>: {exercise.description}
+            <br />
+            <em>Targets: {exercise.muscleGroups.map((mg) => mg.name).join(", ")}</em>
           </li>
         ))}
       </ul>
