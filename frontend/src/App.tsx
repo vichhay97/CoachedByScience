@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
-
-interface MuscleGroup {
-  id: number;
-  name: string;
-}
-
-interface Exercise {
-  id: number;
-  name: string;
-  description: string;
-  muscleGroups: MuscleGroup[];
-}
+import type { Exercise } from "./types";
+import ExerciseList from "./ExerciseList";
 
 function App() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -24,15 +14,7 @@ function App() {
   return (
     <div>
       <h1>Exercises</h1>
-      <ul>
-        {exercises.map((exercise) => (
-          <li key={exercise.id}>
-            <strong>{exercise.name}</strong>: {exercise.description}
-            <br />
-            <em>Targets: {exercise.muscleGroups.map((mg) => mg.name).join(", ")}</em>
-          </li>
-        ))}
-      </ul>
+      <ExerciseList exercises={exercises} />
     </div>
   );
 }
