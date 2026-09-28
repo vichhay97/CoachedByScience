@@ -13,20 +13,24 @@ function App() {
   }, []);
 
   async function handleAddExercise(name: string, description: string) {
-    const response = await fetch("http://localhost:5028/api/exercises", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description })
-    });
+    try {
+      const response = await fetch("http://localhost:5028/api/exercises", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description })
+      });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error(response.status, error);
-      return;
+      if (!response.ok) {
+        const error = await response.text();
+        console.error(response.status, error);
+        return;
+      }
+
+      const created: Exercise = await response.json();
+      setExercises((prev) => [...prev, created]);
+    } catch (error) {
+      console.error("Failed to add exercise: ", error);
     }
-    
-    const created: Exercise = await response.json();
-    setExercises((prev) => [...prev, created]);
   }
 
   return (
