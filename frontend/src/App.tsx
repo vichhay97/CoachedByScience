@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Exercise } from "./types";
+import ExerciseForm from "./ExerciseForm";
 import ExerciseList from "./ExerciseList";
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
   return (
     <div>
       <h1>Exercises</h1>
+      <ExerciseForm />
       <ExerciseList exercises={exercises} />
     </div>
   );
