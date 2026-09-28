@@ -12,10 +12,27 @@ function App() {
       .then((data) => setExercises(data));
   }, []);
 
+  async function handleAddExercise(name: string, description: string) {
+    const response = await fetch("http://localhost:5028/api/exercises", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, description })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error(response.status, error);
+      return;
+    }
+    
+    const created: Exercise = await response.json();
+    setExercises((prev) => [...prev, created]);
+  }
+
   return (
     <div>
       <h1>Exercises</h1>
-      <ExerciseForm />
+      <ExerciseForm onAddExercise={handleAddExercise} />
       <ExerciseList exercises={exercises} />
     </div>
   );
