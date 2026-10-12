@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 import "./ExerciseForm.css";
 
 interface ExerciseFormProps {
@@ -9,16 +9,17 @@ function ExerciseForm({ onAddExercise }: ExerciseFormProps) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
+    async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const success = await onAddExercise(name, description);
+        if (success) {
+            setName("");
+            setDescription("");
+        }
+    }
+
     return (
-        <form className="exercise-form" onSubmit={async (e) => {
-            e.preventDefault();
-            const success = await onAddExercise(name, description);
-            if (success) {
-                setName("");
-                setDescription("");
-            }
-        }}
-        >
+        <form className="exercise-form" onSubmit={handleSubmit}>
             <input placeholder="Exercise Name" value={name} onChange={(e) => setName(e.target.value)} />
             <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
             <button type="submit">Submit</button>
