@@ -5,6 +5,7 @@ import ExerciseList from "./ExerciseList";
 
 function App() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("http://localhost:5028/api/exercises")
@@ -13,6 +14,8 @@ function App() {
   }, []);
 
   async function handleAddExercise(name: string, description: string): Promise<boolean> {
+    setErrorMessage(null);
+    
     try {
       const response = await fetch("http://localhost:5028/api/exercises", {
         method: "POST",
@@ -21,9 +24,20 @@ function App() {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        console.error(response.status, error);
-        return false;
+        if (response.status === 400)
+        {
+          const error: string = await response.json();
+          console.error(response.status, error);
+          setErrorMessage(error);
+          return false;
+        }
+        else
+        {
+          console.error(response.status);
+          setErrorMessage("Something went wrong on the server, please try again.");
+          return false;
+        }
+        
       }
 
       const created: Exercise = await response.json();
@@ -31,6 +45,7 @@ function App() {
       return true;
     } catch (error) {
       console.error("Failed to add exercise: ", error);
+      setErrorMessage("Couldn't reach server, please try again.");
       return false;
     }
   }
@@ -39,6 +54,7 @@ function App() {
     <div>
       <h1>Exercises</h1>
       <ExerciseForm onAddExercise={handleAddExercise} />
+      {errorMessage && <p role="alert">{errorMessage}</p>}
       <ExerciseList exercises={exercises} />
     </div>
   );
