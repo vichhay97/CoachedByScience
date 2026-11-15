@@ -8,14 +8,19 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:5028/api/exercises")
-      .then((response) => response.json())
-      .then((data) => setExercises(data));
+    async function loadExercises() {
+      const response = await fetch("http://localhost:5028/api/exercises");
+      const data = await response.json();
+      setExercises(data);
+    }
+
+    loadExercises();
+
   }, []);
 
   async function handleAddExercise(name: string, description: string): Promise<boolean> {
     setErrorMessage(null);
-    
+
     try {
       const response = await fetch("http://localhost:5028/api/exercises", {
         method: "POST",
@@ -24,20 +29,18 @@ function App() {
       });
 
       if (!response.ok) {
-        if (response.status === 400)
-        {
+        if (response.status === 400) {
           const error: string = await response.json();
           console.error(response.status, error);
           setErrorMessage(error);
           return false;
         }
-        else
-        {
+        else {
           console.error(response.status);
           setErrorMessage("Something went wrong on the server, please try again.");
           return false;
         }
-        
+
       }
 
       const created: Exercise = await response.json();
