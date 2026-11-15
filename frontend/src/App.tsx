@@ -5,13 +5,27 @@ import ExerciseList from "./ExerciseList";
 
 function App() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<string | null>(null);
+  const [loadErrorMessage, setLoadErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadExercises() {
-      const response = await fetch("http://localhost:5028/api/exercises");
-      const data = await response.json();
-      setExercises(data);
+      setLoadErrorMessage(null);
+      const loadFailedMessage = "Couldn't load exercises, please try again.";
+      try {
+        const response = await fetch("http://localhost:5028/api/exercises");
+
+        if (!response.ok) {
+          console.error(response.status);
+          setLoadErrorMessage(loadFailedMessage);
+          return;
+        }
+        const data = await response.json();
+        setExercises(data);
+      } catch (error) {
+        console.error("Failed to fetch exercises: ", error);
+        setLoadErrorMessage(loadFailedMessage);
+      }
     }
 
     loadExercises();
@@ -19,7 +33,7 @@ function App() {
   }, []);
 
   async function handleAddExercise(name: string, description: string): Promise<boolean> {
-    setErrorMessage(null);
+    setSubmitErrorMessage(null);
 
     try {
       const response = await fetch("http://localhost:5028/api/exercises", {
@@ -32,12 +46,12 @@ function App() {
         if (response.status === 400) {
           const error: string = await response.json();
           console.error(response.status, error);
-          setErrorMessage(error);
+          setSubmitErrorMessage(error);
           return false;
         }
         else {
           console.error(response.status);
-          setErrorMessage("Something went wrong on the server, please try again.");
+          setSubmitErrorMessage("Something went wrong on the server, please try again.");
           return false;
         }
 
@@ -48,7 +62,7 @@ function App() {
       return true;
     } catch (error) {
       console.error("Failed to add exercise: ", error);
-      setErrorMessage("Couldn't reach server, please try again.");
+      setSubmitErrorMessage("Couldn't reach server, please try again.");
       return false;
     }
   }
@@ -57,8 +71,9 @@ function App() {
     <div>
       <h1>Exercises</h1>
       <ExerciseForm onAddExercise={handleAddExercise} />
-      {errorMessage && <p role="alert">{errorMessage}</p>}
+      {submitErrorMessage && <p role="alert">{submitErrorMessage}</p>}
       <ExerciseList exercises={exercises} />
+      {loadErrorMessage && <p role="alert">{loadErrorMessage}</p>}
     </div>
   );
 }
